@@ -3,21 +3,21 @@ import copy
 import pytest
 from fastapi.testclient import TestClient
 
-from src.app import app
+import src.app as app_module
 
-client = TestClient(app)
+client = TestClient(app_module.app)
 
 
 @pytest.fixture(autouse=True)
 def reset_activities():
-    original = copy.deepcopy(app.activities)
+    original = copy.deepcopy(app_module.activities)
     yield
-    app.activities.clear()
-    app.activities.update(copy.deepcopy(original))
+    app_module.activities.clear()
+    app_module.activities.update(copy.deepcopy(original))
 
 
 def test_root_redirects_to_index_html():
-    response = client.get("/")
+    response = client.get("/", follow_redirects=False)
 
     assert response.status_code == 307
     assert response.headers["location"] == "/static/index.html"
